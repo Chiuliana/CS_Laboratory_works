@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import *  # Ensure you have necessary functions in utils
+from utils import *
 
 def try_decode(file_content, encodings=['utf-8', 'iso-8859-1', 'windows-1252']):
     for encoding in encodings:
@@ -19,7 +19,7 @@ if 'decrypted_text' not in st.session_state:
 if 'substitution_history' not in st.session_state:
     st.session_state.substitution_history = []
 if 'unused' not in st.session_state:
-    st.session_state.unused = unused.copy()  # Ensure 'unused' is defined in your utils
+    st.session_state.unused = unused.copy()
 if 'previous_states' not in st.session_state:
     st.session_state.previous_states = []  # Store previous states for undo
 

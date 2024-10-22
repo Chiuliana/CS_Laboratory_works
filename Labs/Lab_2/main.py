@@ -34,6 +34,6 @@ str = substitute_letters(str, 'B', 'q')
 frequency = find_frequency(str)
 new_frequency = dict(sorted(frequency.items(), key=lambda x: x[1], reverse=True))
 plot_frequency(new_frequency, label="Frequency of each letter in the text")
-plot_frequency(unused, label=None)
+plot_frequency(english_language_letters_frequency, label=None)
 
 write_to_file(str, "decrypted.txt")

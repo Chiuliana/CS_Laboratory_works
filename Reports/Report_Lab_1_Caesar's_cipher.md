@@ -217,7 +217,11 @@ The implementation of the Caesar cipher and its two-key variant yielded successf
 Below are screenshots illustrating the functionality of the implemented Caesar cipher for each task:
 
 ![Task 1.1 - Basic Caesar Cipher](task1_1.png)
+
+
 *Screenshot 1: Task 1.1. - Demonstrating the basic Caesar cipher encryption and decryption process.*
 
 ![Task 1.2 - Two-Key Caesar Cipher](task1_2.png)
+
+
 *Screenshot 2: Task 1.2 - Demonstrating the two-key Caesar cipher with permuted alphabet generation.*

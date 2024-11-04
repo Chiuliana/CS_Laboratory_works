@@ -28,14 +28,68 @@ def create_playfair_matrix(key):
                 row += 1
 
     return matrix
-    pass
 
 def encrypt_playfair(plaintext, key):
     # Encrypts the plaintext using the Playfair cipher with the given key.
 
-    pass
+    # Remove non-alphabetic characters and convert to uppercase
+    plaintext = ''.join(char.upper() for char in plaintext if char.isalpha())
+
+    # Create the Playfair matrix
+    matrix = create_playfair_matrix(key)
+
+    # Split the plaintext into pairs
+    pairs = [plaintext[i:i + 2] for i in range(0, len(plaintext), 2)]
+    if len(pairs[-1]) == 1:
+        pairs[-1] += 'X'
+
+    # Encrypt the pairs
+    ciphertext = ''
+    for pair in pairs:
+        row1, col1 = None, None
+        row2, col2 = None, None
+        for i in range(5):
+            for j in range(5):
+                if matrix[i][j] == pair[0]:
+                    row1, col1 = i, j
+                elif matrix[i][j] == pair[1]:
+                    row2, col2 = i, j
+
+        if row1 == row2:
+            ciphertext += matrix[row1][(col1 + 1) % 5] + matrix[row2][(col2 + 1) % 5]
+        elif col1 == col2:
+            ciphertext += matrix[(row1 + 1) % 5][col1] + matrix[(row2 + 1) % 5][col2]
+        else:
+            ciphertext += matrix[row1][col2] + matrix[row2][col1]
+
+    return ciphertext
 
 def decrypt_playfair(ciphertext, key):
     # Decrypts the ciphertext using the Playfair cipher with the given key.
 
-    pass
+    # Create the Playfair matrix
+    matrix = create_playfair_matrix(key)
+
+    # Split the ciphertext into pairs
+    pairs = [ciphertext[i:i + 2] for i in range(0, len(ciphertext), 2)]
+
+    # Decrypt the pairs
+    plaintext = ''
+    for pair in pairs:
+        row1, col1 = None, None
+        row2, col2 = None, None
+        for i in range(5):
+            for j in range(5):
+                if matrix[i][j] == pair[0]:
+                    row1, col1 = i, j
+                elif matrix[i][j] == pair[1]:
+                    row2, col2 = i, j
+
+        if row1 == row2:
+            plaintext += matrix[row1][(col1 - 1) % 5] + matrix[row2][(col2 - 1) % 5]
+        elif col1 == col2:
+            plaintext += matrix[(row1 - 1) % 5][col1] + matrix[(row2 - 1) % 5][col2]
+        else:
+            plaintext += matrix[row1][col2] + matrix[row2][col1]
+
+    return plaintext.replace('X', '')

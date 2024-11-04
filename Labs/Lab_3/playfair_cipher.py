@@ -29,22 +29,36 @@ def create_playfair_matrix(key):
 
     return matrix
 
+def format_plaintext(plaintext):
+    # Formats plaintext to split into pairs and insert 'X' between duplicate letters.
+    formatted = ''
+    i = 0
+    while i < len(plaintext):
+        formatted += plaintext[i]
+        if i + 1 < len(plaintext) and plaintext[i] == plaintext[i + 1]:
+            formatted += 'X'
+        elif i + 1 < len(plaintext):
+            formatted += plaintext[i + 1]
+            i += 1
+        i += 1
+    if len(formatted) % 2 != 0:
+        formatted += 'X'
+    return formatted
+
 def encrypt_playfair(plaintext, key):
     # Encrypts the plaintext using the Playfair cipher with the given key.
 
     # Remove non-alphabetic characters and convert to uppercase
     plaintext = ''.join(char.upper() for char in plaintext if char.isalpha())
+    plaintext = format_plaintext(plaintext)
 
     # Create the Playfair matrix
     matrix = create_playfair_matrix(key)
 
     # Split the plaintext into pairs
     pairs = [plaintext[i:i + 2] for i in range(0, len(plaintext), 2)]
-    if len(pairs[-1]) == 1:
-        pairs[-1] += 'X'
+    plaintext = ''
 
-    # Encrypt the pairs
-    ciphertext = ''
     for pair in pairs:
         row1, col1 = None, None
         row2, col2 = None, None
@@ -54,15 +68,13 @@ def encrypt_playfair(plaintext, key):
                     row1, col1 = i, j
                 elif matrix[i][j] == pair[1]:
                     row2, col2 = i, j
-
         if row1 == row2:
-            ciphertext += matrix[row1][(col1 + 1) % 5] + matrix[row2][(col2 + 1) % 5]
+            plaintext += matrix[row1][(col1 + 1) % 5] + matrix[row2][(col2 + 1) % 5]
         elif col1 == col2:
-            ciphertext += matrix[(row1 + 1) % 5][col1] + matrix[(row2 + 1) % 5][col2]
+            plaintext += matrix[(row1 + 1) % 5][col1] + matrix[(row2 + 1) % 5][col2]
         else:
-            ciphertext += matrix[row1][col2] + matrix[row2][col1]
-
-    return ciphertext
+            plaintext += matrix[row1][col2] + matrix[row2][col1]
+    return plaintext
 
 def decrypt_playfair(ciphertext, key):
     # Decrypts the ciphertext using the Playfair cipher with the given key.
@@ -72,9 +84,8 @@ def decrypt_playfair(ciphertext, key):
 
     # Split the ciphertext into pairs
     pairs = [ciphertext[i:i + 2] for i in range(0, len(ciphertext), 2)]
-
-    # Decrypt the pairs
     plaintext = ''
+
     for pair in pairs:
         row1, col1 = None, None
         row2, col2 = None, None
@@ -84,12 +95,10 @@ def decrypt_playfair(ciphertext, key):
                     row1, col1 = i, j
                 elif matrix[i][j] == pair[1]:
                     row2, col2 = i, j
-
         if row1 == row2:
             plaintext += matrix[row1][(col1 - 1) % 5] + matrix[row2][(col2 - 1) % 5]
         elif col1 == col2:
             plaintext += matrix[(row1 - 1) % 5][col1] + matrix[(row2 - 1) % 5][col2]
         else:
             plaintext += matrix[row1][col2] + matrix[row2][col1]
-
     return plaintext.replace('X', '')

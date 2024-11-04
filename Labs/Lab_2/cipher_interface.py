@@ -107,7 +107,7 @@ with col1:
     st.pyplot(fig1)
 
 with col2:
-    st.write("Unused Letters")
+    st.write("Replace Letters")
     fig2, ax2 = plt.subplots()
     ax2.bar(st.session_state.unused.keys(), st.session_state.unused.values())
     ax2.set_xlabel("Letters")

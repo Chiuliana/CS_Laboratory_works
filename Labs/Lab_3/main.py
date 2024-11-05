@@ -2,7 +2,7 @@ from playfair_cipher import encrypt_playfair, decrypt_playfair
 
 if __name__ == "__main__":
     while True:
-        print("Playfair Cipher")
+        print("Playfair Cipher (Romanian Alphabet)")
         print("1. Encrypt")
         print("2. Decrypt")
         print("3. Exit")

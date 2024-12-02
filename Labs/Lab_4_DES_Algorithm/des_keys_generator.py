@@ -46,11 +46,11 @@ def generate_round_keys(key):
     return round_keys
 
 
-# Example usage
 if __name__ == "__main__":
-    # Example 64-bit key as binary list
-    key = [0, 1, 0, 1, 0, 1, 0, 1] * 8
+    user_key = input("Enter a 64-bit binary key (as a string): ")
+    key = [int(b) for b in user_key.strip()]
     round_keys = generate_round_keys(key)
-    print("Generated Round Keys:")
+    print("\nGenerated Round Keys:")
     for i, rk in enumerate(round_keys, 1):
-        print(f"K{i}: {rk}")
+        print(f"Round {i}: {''.join(map(str, rk))}")
+

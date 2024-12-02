@@ -9,10 +9,9 @@ def permuted_choice_1(key):
                  21, 13, 5, 28, 20, 12, 4]
     return [key[i - 1] for i in pc1_table]
 
-
 def left_shift(key_half, shifts):
+    """ Perform left shift on the key half by the specified number of shifts. """
     return key_half[shifts:] + key_half[:shifts]
-
 
 def permuted_choice_2(key):
     pc2_table = [14, 17, 11, 24, 1, 5,
@@ -25,32 +24,26 @@ def permuted_choice_2(key):
                  46, 42, 50, 36, 29, 32]
     return [key[i - 1] for i in pc2_table]
 
-
 def generate_round_keys(key):
-    # Permuted Choice 1
+    # Apply PC-1 to the key
     permuted_key = permuted_choice_1(key)
+    intermediate_steps = {"PC-1": permuted_key, "Shifts": [], "PC-2": [], "Round Keys": []}
+
+    # Split the 56-bit permuted key into two halves (C0 and D0)
     left_half, right_half = permuted_key[:28], permuted_key[28:]
 
-    # Shifts for each round
     shift_schedule = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
-    round_keys = []
 
-    for shifts in shift_schedule:
-        left_half = left_shift(left_half, shifts)
-        right_half = left_shift(right_half, shifts)
-        # Combine halves and permute
+    # Generate 16 round keys
+    for round_number, shifts in enumerate(shift_schedule, start=1):
+        left_half = left_shift(left_half, shifts)  # Apply left shift on the left half
+        right_half = left_shift(right_half, shifts)  # Apply left shift on the right half
+        intermediate_steps["Shifts"].append((left_half.copy(), right_half.copy()))
+
+        # Combine the left and right halves
         combined_key = left_half + right_half
-        round_key = permuted_choice_2(combined_key)
-        round_keys.append(round_key)
+        round_key = permuted_choice_2(combined_key)  # Apply PC-2 to generate round key
+        intermediate_steps["PC-2"].append(combined_key)
+        intermediate_steps["Round Keys"].append(round_key)
 
-    return round_keys
-
-
-if __name__ == "__main__":
-    user_key = input("Enter a 64-bit binary key (as a string): ")
-    key = [int(b) for b in user_key.strip()]
-    round_keys = generate_round_keys(key)
-    print("\nGenerated Round Keys:")
-    for i, rk in enumerate(round_keys, 1):
-        print(f"Round {i}: {''.join(map(str, rk))}")
-
+    return intermediate_steps

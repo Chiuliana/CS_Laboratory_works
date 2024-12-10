@@ -1,9 +1,8 @@
-import os
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.asymmetric import padding
-from datetime import datetime
+import os
 
 
 def generate_user_key(username):
@@ -12,28 +11,54 @@ def generate_user_key(username):
         key_size=2048,
     )
 
-    filename = f"{username}_key.pem"
-    with open(filename, "wb") as key_file:
-        key_file.write(
+    # Save private key
+    private_key_file = f"{username}_key.pem"
+    with open(private_key_file, "wb") as f:
+        f.write(
             private_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.TraditionalOpenSSL,
                 encryption_algorithm=serialization.NoEncryption(),
             )
         )
-    return filename
+
+    # Extract and save public key
+    public_key_file = f"{username}_public_key.pem"
+    public_key = private_key.public_key()
+    with open(public_key_file, "wb") as f:
+        f.write(
+            public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+        )
+
+    print(f"Keys generated: {private_key_file} (private), {public_key_file} (public)")
+    return private_key_file, public_key_file
+
+
+def create_test_file():
+    file_to_sign = "document.txt"
+    if not os.path.exists(file_to_sign):
+        with open(file_to_sign, "w") as doc:
+            doc.write("This is a test document for signing.")
+        print(f"Test file created: {file_to_sign}")
+    return file_to_sign
 
 
 def sign_file(private_key_path, file_to_sign):
+    # Load private key
     with open(private_key_path, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
             key_file.read(),
             password=None,
         )
 
+    # Read file to sign
     with open(file_to_sign, "rb") as f:
         data = f.read()
 
+    # Create signature
     signature = private_key.sign(
         data,
         padding.PSS(
@@ -43,20 +68,20 @@ def sign_file(private_key_path, file_to_sign):
         SHA256(),
     )
 
+    # Save signature
     sig_file = f"{file_to_sign}.sig"
     with open(sig_file, "wb") as sig:
         sig.write(signature)
-
-    print(f"Signature saved to {sig_file}")
+    print(f"Signature created: {sig_file}")
 
 
 if __name__ == "__main__":
-    user_key = generate_user_key("user1")
-    print(f"Generated user key: {user_key}")
+    # Generate keys
+    username = "user1"
+    private_key, public_key = generate_user_key(username)
 
-    file_to_sign = "document.txt"
-    if not os.path.exists(file_to_sign):
-        with open(file_to_sign, "w") as doc:
-            doc.write("This is a test document.")
+    # Create a test document
+    file_to_sign = create_test_file()
 
-    sign_file(user_key, file_to_sign)
+    # Sign the document
+    sign_file(private_key, file_to_sign)
